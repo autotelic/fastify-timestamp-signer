@@ -1,19 +1,9 @@
 'use strict'
 
-const plugin = require('.')
+const signer = require('.')
 
-module.exports = function (fastify, options, next) {
-  fastify.register(plugin, { customOption: 'new', overloaded: 'see-example.js' })
+const secret = 'secret'
 
-  fastify.get('/', (req, reply) => {
-    reply.type('application/json')
-    reply.send({ foo: 'bar' })
-  })
-
-  fastify.post('/', (req, reply) => {
-    reply.type('application/json')
-    reply.send({ hello: 'world' })
-  })
-
-  next()
+module.exports = async function (fastify, options) {
+  fastify.register(signer, { secret })
 }
