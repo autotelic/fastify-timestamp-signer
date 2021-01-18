@@ -9,8 +9,10 @@ const fastifyTimestampSigner = async (fastify, options) => {
   }
 
   const sign = (str) => {
+    return str
   }
   const validate = (str) => {
+    return str
   }
 
   fastify.decorate('sign', sign)
