@@ -35,23 +35,23 @@ test('fastify-timestamp-signer throws error if not initialized with secret.', t 
 })
 
 test('sign method returns a signed string', t => {
-  t.plan(6)
+  t.plan(5)
   const fastify = Fastify()
 
   fastify.register(signer, { secret, sep, encoding })
 
   fastify.ready(async err => {
     t.error(err)
+    const startTime = new Date().getTime()
     const signedString = await fastify.sign(testString)
-    const test = new Date().getTime()
 
     t.type(signedString, 'string')
-    const [value, timestamp, signature] = signedString.split(sep)
 
-    const expiryMinutes = Math.round((timestamp - test) / 60000)
+    const [value, timestamp, signature] = signedString.split(sep)
+    const expiryMinutes = Math.round((timestamp - startTime) / 60000)
+    t.is(expiryMinutes, 5)
+
     t.is(value, testString)
-    t.is(expiryMinutes, 5, 'expiration timestamp equals default')
-    t.is(signature, (await fastify.sign(testString)).split(sep)[2], 'sign returns a reproducable signature')
     t.ok(isBase64(signature))
   })
 })

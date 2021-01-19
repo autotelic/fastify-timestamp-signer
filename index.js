@@ -40,7 +40,7 @@ const fastifyTimestampSigner = async (fastify, options) => {
 
     str = str.concat(sep, timeStamp)
 
-    return str.concat(sep, await getSignature(secret))
+    return str.concat(sep, await getSignature(str))
   }
 
   const validate = (str) => {
