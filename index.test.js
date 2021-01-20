@@ -1,7 +1,7 @@
 const { test } = require('tap')
 const Fastify = require('fastify')
 const isBase64 = require('is-base64')
-const almostEqual = require('almost-equal')
+
 const signer = require('.')
 
 const testString = 'test@example.com'

@@ -28,7 +28,6 @@
     "fastify-plugin": "^3.0.0"
   },
   "devDependencies": {
-    "almost-equal": "^1.1.0",
     "fastify": "^3.0.0",
     "fastify-cli": "^2.5.1",
     "is-base64": "^1.1.0",
