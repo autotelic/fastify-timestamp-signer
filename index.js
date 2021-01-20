@@ -24,12 +24,12 @@ const fastifyTimestampSigner = async (fastify, options) => {
       .toString()
   }
 
-  const getSignature = async (value) => {
+  const getSignature = async (str) => {
     const key = await deriveKey(secret)
 
     return crypto
       .createHmac(algo, key)
-      .update(value)
+      .update(str)
       .digest(encoding)
       .toString()
   }
