@@ -3,13 +3,15 @@
 const fastifyPlugin = require('fastify-plugin')
 const crypto = require('crypto')
 
+const { SHA_512, BASE_64 } = require('./lib/constants')
+
 const fastifyTimestampSigner = async (fastify, options) => {
   const {
     secret,
-    algorithm = 'sha512',
+    algorithm = SHA_512,
     salt = 'fastify-timestamp-singer',
     delimiter = ':',
-    encoding = 'base64'
+    encoding = BASE_64
   } = options
 
   if (!secret || typeof secret !== 'string') {
