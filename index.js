@@ -3,13 +3,13 @@
 const fastifyPlugin = require('fastify-plugin')
 const crypto = require('crypto')
 
+const { generateTimestamp } = require('./lib/helpers')
 const { SHA_512, BASE_64 } = require('./lib/constants')
 
 const fastifyTimestampSigner = async (fastify, options) => {
   const {
     secret,
     algorithm = SHA_512,
-    salt = 'fastify-timestamp-singer',
     delimiter = ':',
     encoding = BASE_64
   } = options
@@ -18,7 +18,7 @@ const fastifyTimestampSigner = async (fastify, options) => {
     throw new Error('secret in options object is missing or not a string')
   }
 
-  const deriveKey = async () => {
+  const deriveKey = async (salt) => {
     return crypto
       .createHmac(algorithm, secret)
       .update(salt)
@@ -26,8 +26,8 @@ const fastifyTimestampSigner = async (fastify, options) => {
       .toString()
   }
 
-  const getSignature = async (str) => {
-    const key = await deriveKey(secret)
+  const getSignature = async (str, salt) => {
+    const key = await deriveKey(salt)
 
     return crypto
       .createHmac(algorithm, key)
@@ -36,12 +36,16 @@ const fastifyTimestampSigner = async (fastify, options) => {
       .toString()
   }
 
-  const sign = async (str) => {
-    const timestamp = new Date().getTime()
+  const sign = async (str, options) => {
+    options = options || {}
+    const {
+      timestamp = generateTimestamp(),
+      salt = 'fastify-timestamp-signer'
+    } = options
 
     str = str.concat(delimiter, timestamp)
 
-    return str.concat(delimiter, await getSignature(str))
+    return str.concat(delimiter, await getSignature(str, salt))
   }
 
   const validate = (str) => {

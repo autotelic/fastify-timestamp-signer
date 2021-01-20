@@ -7,7 +7,7 @@
     "test": "test"
   },
   "scripts": {
-    "test": "tap -R classic --100                  ",
+    "test": "tap --100 -j1 -R classic test/*.test.js",
     "example": "fastify start example.js",
     "lint": "standard",
     "fix": "npm run lint -- --fix",
