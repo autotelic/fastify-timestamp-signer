@@ -6,7 +6,7 @@ const signer = require('.')
 
 const testString = 'test@example.com'
 const secret = 'secret'
-const sep = ':'
+const delimiter = ':'
 const encoding = 'base64'
 
 test('sign and validate decorators exist.', t => {
@@ -39,7 +39,7 @@ test('sign method returns a signed string', t => {
   t.plan(5)
   const fastify = Fastify()
 
-  fastify.register(signer, { secret, sep, encoding })
+  fastify.register(signer, { secret, delimiter, encoding })
 
   fastify.ready(async err => {
     t.error(err)
@@ -47,7 +47,7 @@ test('sign method returns a signed string', t => {
 
     t.type(signedString, 'string')
 
-    const [value, timestamp, signature] = signedString.split(sep)
+    const [value, timestamp, signature] = signedString.split(delimiter)
     t.is(value, testString)
     t.ok(timestamp)
     t.ok(isBase64(signature))

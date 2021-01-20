@@ -6,9 +6,9 @@ const crypto = require('crypto')
 const fastifyTimestampSigner = async (fastify, options) => {
   const {
     secret,
-    algo = 'sha512',
+    algorithm = 'sha512',
     salt = 'fastify-timestamp-singer',
-    sep = ':',
+    delimiter = ':',
     encoding = 'base64'
   } = options
 
@@ -18,7 +18,7 @@ const fastifyTimestampSigner = async (fastify, options) => {
 
   const deriveKey = async () => {
     return crypto
-      .createHmac(algo, secret)
+      .createHmac(algorithm, secret)
       .update(salt)
       .digest(encoding)
       .toString()
@@ -28,7 +28,7 @@ const fastifyTimestampSigner = async (fastify, options) => {
     const key = await deriveKey(secret)
 
     return crypto
-      .createHmac(algo, key)
+      .createHmac(algorithm, key)
       .update(str)
       .digest(encoding)
       .toString()
@@ -37,9 +37,9 @@ const fastifyTimestampSigner = async (fastify, options) => {
   const sign = async (str) => {
     const timestamp = new Date().getTime()
 
-    str = str.concat(sep, timestamp)
+    str = str.concat(delimiter, timestamp)
 
-    return str.concat(sep, await getSignature(str))
+    return str.concat(delimiter, await getSignature(str))
   }
 
   const validate = (str) => {
