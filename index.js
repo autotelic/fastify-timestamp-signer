@@ -34,11 +34,10 @@ const fastifyTimestampSigner = async (fastify, options) => {
       .toString()
   }
 
-  const sign = async (str, expiresIn = 5) => {
-    const timeNow = new Date().getTime()
-    const timeStamp = new Date(timeNow + expiresIn * 60000).getTime()
+  const sign = async (str) => {
+    const timestamp = new Date().getTime()
 
-    str = str.concat(sep, timeStamp)
+    str = str.concat(sep, timestamp)
 
     return str.concat(sep, await getSignature(str))
   }

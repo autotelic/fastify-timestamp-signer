@@ -1,6 +1,7 @@
 const { test } = require('tap')
 const Fastify = require('fastify')
 const isBase64 = require('is-base64')
+const almostEqual = require('almost-equal')
 const signer = require('.')
 
 const testString = 'test@example.com'
@@ -42,16 +43,13 @@ test('sign method returns a signed string', t => {
 
   fastify.ready(async err => {
     t.error(err)
-    const startTime = new Date().getTime()
     const signedString = await fastify.sign(testString)
 
     t.type(signedString, 'string')
 
     const [value, timestamp, signature] = signedString.split(sep)
-    const expiryMinutes = Math.round((timestamp - startTime) / 60000)
-    t.is(expiryMinutes, 5)
-
     t.is(value, testString)
+    t.ok(timestamp)
     t.ok(isBase64(signature))
   })
 })
