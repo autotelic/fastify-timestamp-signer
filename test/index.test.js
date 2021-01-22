@@ -37,7 +37,6 @@ test('fastify-timestamp-signer throws error if not initialized with secret.', t 
 
 test('sign method:', t => {
   t.test('returns a signed string', async t => {
-    t.plan(1)
     const expectedSignedString = 'test@example.com:1611274828425:6OjI9CLdNfafzrYOxjNWWCDi1mC3rg25BsFr7CTPXKlJfGbYUWQgpEGmhqsf6tKNCTYrCpKzFTUhSGNZMBiVKQ=='
     const fastify = Fastify()
 
@@ -48,7 +47,6 @@ test('sign method:', t => {
     t.is(signedString, expectedSignedString)
   })
   test('assigns default values in absence of options', async t => {
-    t.plan(1)
     const expectedSignedString = 'test@example.com:1611274828425:WVe+5Gh56fsugvkOEFKvZ4mDlq/YYVI6aRH9TPTqmnJx5yrk1UyXp6fi39m9X7prctIv8PIv5QzS8W8FIVdq9g=='
     const fastify = Fastify()
 
