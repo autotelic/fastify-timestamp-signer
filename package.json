@@ -7,7 +7,7 @@
     "test": "test"
   },
   "scripts": {
-    "test": "tap -R classic --100                  ",
+    "test": "tap --100 -j1 -R classic test/*.test.js",
     "example": "fastify start example.js",
     "lint": "standard",
     "fix": "npm run lint -- --fix",
@@ -31,6 +31,7 @@
     "fastify": "^3.0.0",
     "fastify-cli": "^2.5.1",
     "lint-staged": "^10.2.11",
+    "sinon": "^9.2.3",
     "standard": "^14.3.4",
     "tap": "^14.0.0"
   },
