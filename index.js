@@ -26,30 +26,30 @@ const fastifyTimestampSigner = async (fastify, options) => {
       .toString()
   }
 
-  const getSignature = async (str, salt) => {
+  const getSignature = async (string, salt) => {
     const key = await deriveKey(salt)
 
     return crypto
       .createHmac(algorithm, key)
-      .update(str)
+      .update(string)
       .digest(encoding)
       .toString()
   }
 
-  const sign = async (str, options) => {
+  const sign = async (string, options) => {
     options = options || {}
     const {
       timestamp = generateTimestamp(),
       salt = 'fastify-timestamp-signer'
     } = options
 
-    str = str.concat(delimiter, timestamp)
+    string = string.concat(delimiter, timestamp)
 
-    return str.concat(delimiter, await getSignature(str, salt))
+    return string.concat(delimiter, await getSignature(string, salt))
   }
 
-  const validate = (str) => {
-    return str
+  const validate = (string) => {
+    return string
   }
 
   fastify.decorate('sign', sign)
