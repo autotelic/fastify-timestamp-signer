@@ -3,7 +3,6 @@
 const fastifyPlugin = require('fastify-plugin')
 const crypto = require('crypto')
 
-const { generateTimestamp } = require('./lib/helpers')
 const { SHA_512, BASE_64 } = require('./lib/constants')
 
 const fastifyTimestampSigner = async (fastify, options) => {
@@ -38,7 +37,7 @@ const fastifyTimestampSigner = async (fastify, options) => {
 
   const sign = async (string, options = {}) => {
     const {
-      timestamp = generateTimestamp(),
+      timestamp = new Date().getTime(),
       salt = 'fastify-timestamp-signer'
     } = options
 
