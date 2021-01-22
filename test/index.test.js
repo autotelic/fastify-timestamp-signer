@@ -3,6 +3,7 @@ const Fastify = require('fastify')
 
 const signer = require('..')
 const { useFakeTimers } = require('sinon')
+
 const testString = 'test@example.com'
 const secret = 'secret'
 const testSalt = 'test-salt'
@@ -54,7 +55,7 @@ test('sign method:', t => {
     fastify.register(signer, { secret })
 
     await fastify.ready()
-    const clock = useFakeTimers(new Date(testTimestamp).getTime())
+    const clock = useFakeTimers((new Date(testTimestamp)).getTime())
     const signedString = await fastify.sign(testString)
     clock.restore()
     t.is(signedString, expectedSignedString)
