@@ -36,16 +36,16 @@ const fastifyTimestampSigner = async (fastify, options) => {
       .toString()
   }
 
-  const sign = async (string, options) => {
-    options = options || {}
+  const sign = async (string, options = {}) => {
     const {
       timestamp = generateTimestamp(),
       salt = 'fastify-timestamp-signer'
     } = options
 
-    string = string.concat(delimiter, timestamp)
+    const timestampedString = string.concat(delimiter, timestamp)
+    const signedString = timestampedString.concat(delimiter, await getSignature(string, salt))
 
-    return string.concat(delimiter, await getSignature(string, salt))
+    return signedString
   }
 
   const validate = (string) => {
