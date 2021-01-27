@@ -42,13 +42,32 @@ const fastifyTimestampSigner = async (fastify, options) => {
     } = options
 
     const timestampedString = string.concat(delimiter, timestamp)
-    const signedString = timestampedString.concat(delimiter, await getSignature(string, salt))
+    const signedString = timestampedString.concat(delimiter, await getSignature(timestampedString, salt))
 
     return signedString
   }
 
-  const validate = (string) => {
-    return string
+  const validate = async (signedString, maxAge = 5, options = {}) => {
+    const { salt = 'fastify-timestamp-signer', validateTime = new Date().getTime() } = options
+
+    if (!signedString.includes(delimiter)) return false
+
+    const [string, timestamp, signature] = signedString.split(delimiter)
+
+    const timestampedString = string.concat(delimiter, timestamp)
+    const expectedSignature = await getSignature(timestampedString, salt)
+
+    if (signature !== expectedSignature) {
+      return false
+    }
+
+    const minutesElapsed = (validateTime - timestamp) / (60 * 1000)
+
+    if (minutesElapsed > maxAge) {
+      return false
+    }
+
+    return true
   }
 
   fastify.decorate('sign', sign)
