@@ -42,7 +42,7 @@ const fastifyTimestampSigner = async (fastify, options) => {
     } = options
 
     const timestampedString = string.concat(delimiter, timestamp)
-    const signedString = timestampedString.concat(delimiter, await getSignature(string, salt))
+    const signedString = timestampedString.concat(delimiter, await getSignature(timestampedString, salt))
 
     return signedString
   }
