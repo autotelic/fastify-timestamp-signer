@@ -37,7 +37,7 @@ test('fastify-timestamp-signer throws error if not initialized with secret.', t 
 
 test('sign method:', t => {
   t.test('returns a signed string', async t => {
-    const expectedSignedString = 'test@example.com:1611274828425:6OjI9CLdNfafzrYOxjNWWCDi1mC3rg25BsFr7CTPXKlJfGbYUWQgpEGmhqsf6tKNCTYrCpKzFTUhSGNZMBiVKQ=='
+    const expectedSignedString = 'test@example.com:1611274828425:e/X8iNL8xP5DB0MkpGo6kZa07h7Miu+61rn6h8DOIwszcZdCizOdFOU7w6O2xIapkWoLyLubo/lVMtjNrlwf4g=='
     const fastify = Fastify()
 
     fastify.register(signer, { secret })
@@ -47,7 +47,7 @@ test('sign method:', t => {
     t.is(signedString, expectedSignedString)
   })
   test('assigns default values in absence of options', async t => {
-    const expectedSignedString = 'test@example.com:1611274828425:WVe+5Gh56fsugvkOEFKvZ4mDlq/YYVI6aRH9TPTqmnJx5yrk1UyXp6fi39m9X7prctIv8PIv5QzS8W8FIVdq9g=='
+    const expectedSignedString = 'test@example.com:1611274828425:1hfFj1yUPuGmTw0f2KcNIxcRbQN76v3u2A+ulE3k+5MSI3mvZsDGB3LHPWTg6Q1deg+aRhkvVXbhObIyV7wWHQ=='
     const fastify = Fastify()
 
     fastify.register(signer, { secret })
@@ -71,4 +71,46 @@ test('validate method returns a string', t => {
     t.error(err)
     t.type(typeof fastify.validate('test string'), 'string')
   })
+})
+
+test('validate method:', t => {
+  t.test('Returns true if signature is authenticated and timestamp is not expired', async t => {
+    const fastify = Fastify()
+
+    const signedString = 'test@example.com:1611274828425:e/X8iNL8xP5DB0MkpGo6kZa07h7Miu+61rn6h8DOIwszcZdCizOdFOU7w6O2xIapkWoLyLubo/lVMtjNrlwf4g=='
+    fastify.register(signer, { secret })
+    await fastify.ready()
+    const clock = useFakeTimers((new Date(testTimestamp)).getTime() + (1000 * 60 * 5))
+
+    const validated = await fastify.validate(signedString, 5, { salt: testSalt })
+    clock.restore()
+    t.is(validated, true)
+  })
+  t.test('Returns false if signature is not authenticated', async t => {
+    const fastify = Fastify()
+
+    const signedString = 'test@example.com:1611274828425:BAD_SINATURE'
+    fastify.register(signer, { secret })
+    await fastify.ready()
+    const clock = useFakeTimers((new Date(testTimestamp)).getTime() + (1000 * 60 * 5))
+
+    const validated = await fastify.validate(signedString, 5, { salt: testSalt })
+    clock.restore()
+    t.is(validated, false)
+  })
+  t.test('Returns false if timestamp is expired', async t => {
+    const fastify = Fastify()
+
+    const signedString = 'test@example.com:1611274828425:e/X8iNL8xP5DB0MkpGo6kZa07h7Miu+61rn6h8DOIwszcZdCizOdFOU7w6O2xIapkWoLyLubo/lVMtjNrlwf4g=='
+    fastify.register(signer, { secret })
+
+    await fastify.ready()
+    const clock = useFakeTimers((new Date(testTimestamp)).getTime() + (1000 * 60 * 6))
+
+    const validated = await fastify.validate(signedString, 5, { salt: testSalt })
+    clock.restore()
+    t.is(validated, false)
+  })
+
+  t.end()
 })
