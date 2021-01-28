@@ -19,7 +19,7 @@ module.exports = async function (fastify, options) {
   fastify.post('/validate', async (req, reply) => {
     const { body: { signedString } } = req
     const maxAge = 10
-    const isValidated = await fastify.validate(signedString, maxAge, { salt: 'example-salt' })
-    reply.send({ isValidated })
+    const validated = await fastify.validate(signedString, maxAge, { salt: 'example-salt' })
+    reply.send({ validated })
   })
 }
