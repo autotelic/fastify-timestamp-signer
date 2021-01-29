@@ -30,6 +30,7 @@
   "devDependencies": {
     "fastify": "^3.0.0",
     "fastify-cli": "^2.5.1",
+    "husky": "^4.3.8",
     "lint-staged": "^10.2.11",
     "sinon": "^9.2.3",
     "standard": "^14.3.4",
@@ -39,5 +40,10 @@
     "*.{js,jsx}": [
       "npm run fix"
     ]
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged && npm test"
+    }
   }
 }
