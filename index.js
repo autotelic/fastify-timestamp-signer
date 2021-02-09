@@ -70,8 +70,7 @@ const fastifyTimestampSigner = async (fastify, options) => {
     return true
   }
 
-  fastify.decorate('sign', sign)
-  fastify.decorate('validate', validate)
+  fastify.decorate('signer', { sign, validate })
 }
 
 module.exports = fastifyPlugin(fastifyTimestampSigner, {
