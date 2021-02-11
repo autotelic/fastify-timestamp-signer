@@ -1,7 +1,7 @@
 'use strict'
 
 const fastifyPlugin = require('fastify-plugin')
-const crypto = require('crypto')
+const { createHmac, timingSafeEqual } = require('crypto')
 
 const { SHA_512, BASE_64 } = require('./lib/constants')
 
@@ -18,8 +18,7 @@ const fastifyTimestampSigner = async (fastify, options) => {
   }
 
   const deriveKey = async (salt) => {
-    return crypto
-      .createHmac(algorithm, secret)
+    return createHmac(algorithm, secret)
       .update(salt)
       .digest(encoding)
       .toString()
@@ -28,8 +27,7 @@ const fastifyTimestampSigner = async (fastify, options) => {
   const getSignature = async (string, salt) => {
     const key = await deriveKey(salt)
 
-    return crypto
-      .createHmac(algorithm, key)
+    return createHmac(algorithm, key)
       .update(string)
       .digest(encoding)
       .toString()
@@ -57,7 +55,14 @@ const fastifyTimestampSigner = async (fastify, options) => {
     const timestampedString = string.concat(delimiter, timestamp)
     const expectedSignature = await getSignature(timestampedString, salt)
 
-    if (signature !== expectedSignature) {
+    const signatureBuffer = Buffer.from(signature)
+    const expectedSignatureBuffer = Buffer.from(expectedSignature)
+
+    if (signatureBuffer.length !== expectedSignatureBuffer.length) {
+      return false
+    }
+
+    if (!timingSafeEqual(signatureBuffer, expectedSignatureBuffer)) {
       return false
     }
 
