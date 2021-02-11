@@ -76,10 +76,21 @@ test('validate method:', t => {
 
     t.is(validated, true)
   })
-  t.test('Returns false if signature is not authenticated', async t => {
+  t.test('Returns false if signature is not valid', async t => {
+    const fastify = Fastify()
+    const signedString = 'test@example.com:1611274828425:e/X8iNL8xP5DB0MkpGo6kZa07h7Miu+61rn6h8DOIwszcZdCizOdFOU7w6O2xIapkWoLyLubo/lVMtjNrlwf4h=='
+    fastify.register(signer, { secret })
+    await fastify.ready()
+    const clock = useFakeTimers((new Date(testTimestamp)).getTime() + (1000 * 60 * 5))
+
+    const validated = await fastify.validate(signedString, 5, { salt: testSalt })
+    clock.restore()
+    t.is(validated, false)
+  })
+  t.test('Returns false if signature is different length than expected', async t => {
     const fastify = Fastify()
 
-    const signedString = 'test@example.com:1611274828425:BAD_SINATURE'
+    const signedString = 'test@example.com:1611274828425:BAD_SIGNATURE'
     fastify.register(signer, { secret })
 
     await fastify.ready()
