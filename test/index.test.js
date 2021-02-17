@@ -56,21 +56,10 @@ test('sign method:', t => {
     const clock = useFakeTimers((new Date(testTimestamp)).getTime())
     const signedString = await fastify.sign(testString)
     clock.restore()
+
     t.is(signedString, expectedSignedString)
   })
   t.end()
-})
-
-test('validate method returns a string', t => {
-  t.plan(2)
-  const fastify = Fastify()
-
-  fastify.register(signer, { secret })
-
-  fastify.ready(err => {
-    t.error(err)
-    t.type(typeof fastify.validate('test string'), 'string')
-  })
 })
 
 test('validate method:', t => {
@@ -79,23 +68,36 @@ test('validate method:', t => {
 
     const signedString = 'test@example.com:1611274828425:e/X8iNL8xP5DB0MkpGo6kZa07h7Miu+61rn6h8DOIwszcZdCizOdFOU7w6O2xIapkWoLyLubo/lVMtjNrlwf4g=='
     fastify.register(signer, { secret })
+
     await fastify.ready()
     const clock = useFakeTimers((new Date(testTimestamp)).getTime() + (1000 * 60 * 5))
-
     const validated = await fastify.validate(signedString, 5, { salt: testSalt })
     clock.restore()
+
     t.is(validated, true)
   })
-  t.test('Returns false if signature is not authenticated', async t => {
+  t.test('Returns false if signature is not valid', async t => {
     const fastify = Fastify()
-
-    const signedString = 'test@example.com:1611274828425:BAD_SINATURE'
+    const signedString = 'test@example.com:1611274828425:e/X8iNL8xP5DB0MkpGo6kZa07h7Miu+61rn6h8DOIwszcZdCizOdFOU7w6O2xIapkWoLyLubo/lVMtjNrlwf4h=='
     fastify.register(signer, { secret })
     await fastify.ready()
     const clock = useFakeTimers((new Date(testTimestamp)).getTime() + (1000 * 60 * 5))
 
     const validated = await fastify.validate(signedString, 5, { salt: testSalt })
     clock.restore()
+    t.is(validated, false)
+  })
+  t.test('Returns false if signature is different length than expected', async t => {
+    const fastify = Fastify()
+
+    const signedString = 'test@example.com:1611274828425:BAD_SIGNATURE'
+    fastify.register(signer, { secret })
+
+    await fastify.ready()
+    const clock = useFakeTimers((new Date(testTimestamp)).getTime() + (1000 * 60 * 5))
+    const validated = await fastify.validate(signedString, 5, { salt: testSalt })
+    clock.restore()
+
     t.is(validated, false)
   })
   t.test('Returns false if timestamp is expired', async t => {
@@ -106,10 +108,36 @@ test('validate method:', t => {
 
     await fastify.ready()
     const clock = useFakeTimers((new Date(testTimestamp)).getTime() + (1000 * 60 * 6))
-
     const validated = await fastify.validate(signedString, 5, { salt: testSalt })
     clock.restore()
+
     t.is(validated, false)
+  })
+  t.test('Returns false if signed string does not contain delimiter', async t => {
+    const fastify = Fastify()
+
+    const signedString = 'test@example.com1611274828425e/X8iNL8xP5DB0MkpGo6kZa07h7Miu+61rn6h8DOIwszcZdCizOdFOU7w6O2xIapkWoLyLubo/lVMtjNrlwf4g=='
+    fastify.register(signer, { secret })
+
+    await fastify.ready()
+    const clock = useFakeTimers((new Date(testTimestamp)).getTime() + (1000 * 60 * 5))
+    const validated = await fastify.validate(signedString, 5, { salt: testSalt })
+    clock.restore()
+
+    t.is(validated, false)
+  })
+  test('assigns default values in absence of options', async t => {
+    const signedString = 'test@example.com:1611274828425:1hfFj1yUPuGmTw0f2KcNIxcRbQN76v3u2A+ulE3k+5MSI3mvZsDGB3LHPWTg6Q1deg+aRhkvVXbhObIyV7wWHQ=='
+    const fastify = Fastify()
+
+    fastify.register(signer, { secret })
+
+    await fastify.ready()
+    const clock = useFakeTimers((new Date(testTimestamp)).getTime())
+    const validated = await fastify.validate(signedString)
+    clock.restore()
+
+    t.is(validated, true)
   })
 
   t.end()
