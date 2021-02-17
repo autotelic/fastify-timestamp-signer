@@ -1,6 +1,6 @@
 {
   "name": "@autotelic/fastify-timestamp-signer",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "A fastify plugin for signing and validating strings",
   "main": "index.js",
   "directories": {
