@@ -4,6 +4,8 @@
   "description": "A fastify plugin for signing and validating strings",
   "main": "index.js",
   "files": [
+    "index.js",
+    "lib/constants.js",
     "index.d.ts"
   ],
   "types": "index.d.ts",
