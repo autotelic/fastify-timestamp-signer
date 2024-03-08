@@ -3,6 +3,10 @@
   "version": "0.1.0",
   "description": "A fastify plugin for signing and validating strings",
   "main": "index.js",
+  "files": [
+    "index.d.ts"
+  ],
+  "types": "index.d.ts",
   "directories": {
     "test": "test"
   },
